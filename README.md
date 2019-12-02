@@ -17,7 +17,7 @@ Submission to the NPM registry currently in progress.
 Import `./minitables/index` and create a new table.
 We will assume there is a `./config.json` file that contains server configuration files
 
-We will create a `_session` variable, because `MiniTables` will **save data (sync), so that that data is not lost during restart**. If it is not set 
+We will create a `_session` variable, because `MiniTables` will **save data (sync), so that that data is not lost during restart**.
 
 ### Initialize
 ```javascript
