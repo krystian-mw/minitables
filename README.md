@@ -1,71 +1,143 @@
-# minitables
+# MiniTables
 
-Zero:
+A abstract table-only database.
 
-* Dependancies
-* Promises
-* Delays
+**Zero:**
+- Dependencies
+- Promises
+- Response Delays
 
-Data is synced so during process restart it will still be present
+# Install
 
-## Install
+Simply `require` the `index.js` file.
+Submission to the NPM registry currently in progress. 
 
-Simply include `index.js`:
+# Usage
 
-`const MT = require('./minitables')`
+Import `./minitables/index` and create a new table.
+We will assume there is a `./config.json` file that contains server configuration files
 
-** Note - not officialy yet on NPM
+We will create a `_session` variable, because `MiniTables` will **save data (sync), so that that data is not lost during restart**. If it is not set 
 
-## Usage
+### Initialize
+```javascript
+const MiniTables = require('./minitables/index');
+const config = require('./config.json');
+const TableName = `SessionStorage-${config._session}` || 'SessionStorage';
 
-### Create a table
+const Schema = config.schema || {
+	uuid: {
+		required: true,
+		unique: true,
+		index: true,
+		min: 36,
+		max: 36,
+		onlyChar: true
+	},
+	token: {
+		required: true,
+		min: 64,
+		max: 128,
+		onlyChar: true
+	},
+	expiry: {
+		type: Number,
+		min: new Date().getTime(),
+		max: new Date().getTime() + 1000000
+	}
+}
 
-`const ServerSessionStorage = new MT('ServerSessionStorage', {
-  hash: {  
-    required: true,    
-    type: String,    
-    index: true,    
-    min: 0,    
-    max: 65536,    
-    unique: true    
-  },  
-  token: {  
-    required: true,    
-    type: String,    
-    index: false,    
-    min: 0,        
-    max: 64    
-  },  
-  expiry: {  
-    required: true,    
-    min: new Date().getTime(),    
-    max: new Date().getTime() + 1000000,    
-    index: false    
-  }  
-})`
+const SessionStorage = new MiniTables(TableName, Schema, config.MiniTablesConfig);
+```
 
-### Insert Record
+### CRUD
+#### Create
+```javascript
 
-`ServerSessionStorage.Insert({
-  hash: 'someRandomHash',  
-  token: 'someUUID',
-  expiry: new Data().getTime() + 36000  
-})`
+const uuid = () => {return(""+1e7+-1e3+-4e3+-8e3+-1e11).replace(/1|0/g,function(){return(0|Math.random()*16).toString(16)})}
 
-### Retrieve Record
+SessionStorage.Insert({
+	hash: uuid(),
+	token: uuid(),
+	expiry: new Date().getTime() + (1000 * 60 * 60 * 24 * 7) // 7 days
+});
 
-`ServerSessionStorage.Get({
-  hash: 'someRandomHash'  
- })`
+// Or in batches, as an array
 
-### Update Record
+// Generate 10 random records
+let temp = [];
 
-`ServerSessionStorage.Update({
-  hash: 'someRandomHash',  
-  token: 'anotherUUID'  
-})`
+for (let i = 0; i < 10; i++) {
+	temp.push({ hash: uuid(), token: uuid(), expiry: new Date().getTime() + (1000 * 60 * 60 * 24 * 7) })
+}
 
-### Delete Record
+SessionStorage.Insert(temp);
+```
+#### Read
+**Records are returned in arrays!**
+```javascript
+const server = (req, res) => {
+	// .Get(SearchIndexedKey, SearchValue)
+	const uuid = SessionStorage.Get('uuid', req.cookies.uuid) 
+	/*
+		RESULTS ARE ALWAYS RETURN IN ARRAYS
+	*/
+	if (uuid[0].token === req.cookies.token) {
+		...
+	}
+}
+```
+#### Update
+Simple as:
+```javascript
+SessionStorage.Update({
+	uuid: req.cookies.uuid,
+	token: uuid()
+});
+```
+#### Delete
+Each record will have a `id` key by default (which can be renamed, in this example `uuid` would be the perfect and only candidate).
 
-`const id = ServerSessionStorage.Get('hash', 'someRandomHash').id
-ServerSessionStorage.Remove(id)`
+**RECORDS CAN ONLY BE DELETED BY THEIR ID's**
+```javascript
+...
+	const id = SessionStorage.Get('uuid', req.cookies)[0].id;
+	SessionStorage.Remove(id);
+	
+...
+```
+
+# Source Configuration Defaults
+
+```javascript
+module.exports  =  class  Table {
+	constructor (name, schema, config) {
+		this.FILE  =  homedir  +  '/minitables/'  +  name  +  '.json' 
+		this.config  = { //  Tables
+			sync:  true, // If true, save upon each change to a file
+			validate:  false, // Not yet supported
+			idName:  'id', 
+			/* Each table requires a id,
+			and have at least ONE index key,
+			as !!! only indexed keys will be able to get searched by !!! */
+			...config
+		}
+
+		...
+
+		const  DefaultSchemaConfig  = { // Keys
+			unique: false,
+			type:  String,
+			min:  Infinity,
+			max:  Infinity,
+			onlyChar:  false, // Regex A-Z, a-z, -, (space) e.g Names
+			onlyNonChar:  false, // Numbers and special chars only
+			index:  false,
+			required:  false // allow nulls
+		}
+		
+		...
+		
+	}
+}
+```
