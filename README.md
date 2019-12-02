@@ -46,26 +46,26 @@ Simply include `index.js`:
 
 ### Insert Record
 
-ServerSessionStorage.Insert({
+`ServerSessionStorage.Insert({
   hash: 'someRandomHash',
   token: 'someUUID',
   expiry: new Data().getTime() + 36000
-})
+})`
 
 ### Retrieve Record
 
-ServerSessionStorage.Get({
+`ServerSessionStorage.Get({
   hash: 'someRandomHash'
- })
+ })`
 
 ### Update Record
 
-ServerSessionStorage.Update({
+`ServerSessionStorage.Update({
   hash: 'someRandomHash',
   token: 'anotherUUID'
-})
+})`
 
 ### Delete Record
 
-const id = ServerSessionStorage.Get('hash', 'someRandomHash').id
-ServerSessionStorage.Remove(id)
+`const id = ServerSessionStorage.Get('hash', 'someRandomHash').id
+ServerSessionStorage.Remove(id)`
