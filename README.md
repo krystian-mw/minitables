@@ -21,83 +21,51 @@ Simply include `index.js`:
 ### Create a table
 
 `const ServerSessionStorage = new MT('ServerSessionStorage', {
-
-  hash: {
-  
-    required: true,
-    
-    type: String,
-    
-    index: true,
-    
-    min: 0,
-    
-    max: 65536,
-    
-    unique: true
-    
-  },
-  
-  token: {
-  
-    required: true,
-    
-    type: String,
-    
-    index: false,
-    
-    min: 0,
-        
-    max: 64
-    
-  },
-  
-  expiry: {
-  
-    required: true,
-    
-    min: new Date().getTime(),
-    
-    max: new Date().getTime() + 1000000,
-    
-    index: false
-    
-  }
-  
+  hash: {  
+    required: true,    
+    type: String,    
+    index: true,    
+    min: 0,    
+    max: 65536,    
+    unique: true    
+  },  
+  token: {  
+    required: true,    
+    type: String,    
+    index: false,    
+    min: 0,        
+    max: 64    
+  },  
+  expiry: {  
+    required: true,    
+    min: new Date().getTime(),    
+    max: new Date().getTime() + 1000000,    
+    index: false    
+  }  
 })`
 
 ### Insert Record
 
 `ServerSessionStorage.Insert({
-
-  hash: 'someRandomHash',
-  
+  hash: 'someRandomHash',  
   token: 'someUUID',
-  
-  expiry: new Data().getTime() + 36000
-  
+  expiry: new Data().getTime() + 36000  
 })`
 
 ### Retrieve Record
 
 `ServerSessionStorage.Get({
-
-  hash: 'someRandomHash'
-  
+  hash: 'someRandomHash'  
  })`
 
 ### Update Record
 
 `ServerSessionStorage.Update({
-
-  hash: 'someRandomHash',
-  
-  token: 'anotherUUID'
-  
+  hash: 'someRandomHash',  
+  token: 'anotherUUID'  
 })`
 
 ### Delete Record
 
 `const id = ServerSessionStorage.Get('hash', 'someRandomHash').id
-
 ServerSessionStorage.Remove(id)`
