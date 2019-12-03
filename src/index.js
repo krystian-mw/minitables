@@ -46,6 +46,7 @@ module.exports = class Table {
             sync: true,
             validate: false, // Not yet supported
             idName: 'id',
+            filePrefix: 'mdb', // No Slashes!
             ...config
         }
 
