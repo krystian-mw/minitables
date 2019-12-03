@@ -48,7 +48,7 @@ module.exports = class Table {
             ...config
         }
                 
-        this.FILE = homedir + `/${filePrefix}/` + name + '.json'
+        this.FILE = homedir + `/${this.config.filePrefix}/` + name + '.json'
 
         if (fs.existsSync(this.FILE) && this.config.sync) {
             this.Load()
