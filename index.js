@@ -40,14 +40,15 @@ const _ClusterSearch = async (Threads, ArrObj, SearchKey, SearchMatch) => {
 module.exports = class Table {
     constructor (name, schema, config) {
 
-        this.FILE = homedir + '/mdb/' + name + '.json'
-
         this.config = {
             sync: true,
             validate: false, // Not yet supported
             idName: 'id',
+            filePrefix: 'mdb', // No Slashes!
             ...config
         }
+                
+        this.FILE = homedir + `/${filePrefix}/` + name + '.json'
 
         if (fs.existsSync(this.FILE) && this.config.sync) {
             this.Load()
